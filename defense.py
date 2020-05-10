@@ -23,7 +23,6 @@ def l1_distance(model, img, sigma,transform):
 
 def detect(adv_dir,model,sigma,num,transform,threshold):
     """
-
     :param adv_dir: dirctory of adv examples
     :param model: arcface net
     :param sigma: variance of Gaussian noise
@@ -57,7 +56,6 @@ def detect(adv_dir,model,sigma,num,transform,threshold):
 
 def get_natural_acc(natural_dir,model,sigma,num,transform,threshold):
     """
-
     :param adv_dir: dirctory of adv examples
     :param model: arcface net
     :param sigma: variance of Gaussian noise
@@ -78,7 +76,7 @@ def get_natural_acc(natural_dir,model,sigma,num,transform,threshold):
             img = Image.open(adv_img_path)
             img = transform(img)
             # img_noise = noisy(img,sigma)
-            distance = l1_distance(model,img,sigma)
+            distance = l1_distance(model,img,sigma,transform)
             l1_val.append(distance)
         np.asarray(l1_val)
         mean_distance = np.mean(l1_val)
@@ -94,17 +92,15 @@ def main():
     sigma = 0.3
     sample_num = 100
     threshold = 7
-    model = load_net() # load the arcface here
-    transform = T.ToTensor()
-    natural_dir = 'C:\Users\Heetika\Documents\AllMyProjects\advhat-master\advhat-master\Demo\Data_Nat'    # path to the dir of natural examples
-    adv_dir = 'C:\Users\Heetika\Documents\AllMyProjects\advhat-master\advhat-master\Demo\Data_Adv'      # path to the dir of adversarial examples
-    fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,
-                                     transform,threshold)
-    tpr, count_adv = detect(adv_dir,model,sigma,sample_num,
-                            transform,threshold)
+    model = load_net() #the arcfacce here
+    transforms = T.ToTensor()
+    natural_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Nat' # path to the dir of natural
+    adv_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Adv'      # path to the dir of adversarial 
+    fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,transforms,threshold)
+    tpr, count_adv = detect(adv_dir,model,sigma,sample_num,transforms,threshold)
     print(f"at threshold{threshold}, sigma{sigma}, we get nat: {count_nat}, "
           f"tpr: {tpr:.2f},  nat: {count_adv}, fpr: {fpr:.2f}")
-    
+
 
 if __name__ == '__main__':
-    main()
+    main() 
