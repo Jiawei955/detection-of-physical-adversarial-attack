@@ -96,8 +96,8 @@ def main():
     threshold = 7
     model = load_net() # load the arcface here
     transform = T.ToTensor()
-    natural_dir = ''    # path to the dir of natural examples
-    adv_dir = ''      # path to the dir of adversarial examples
+    natural_dir = 'C:\Users\Heetika\Documents\AllMyProjects\advhat-master\advhat-master\Demo\Data_Nat'    # path to the dir of natural examples
+    adv_dir = 'C:\Users\Heetika\Documents\AllMyProjects\advhat-master\advhat-master\Demo\Data_Adv'      # path to the dir of adversarial examples
     fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,
                                      transform,threshold)
     tpr, count_adv = detect(adv_dir,model,sigma,sample_num,
