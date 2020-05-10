@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torchvision import transforms as T
+from torchvision import transforms
 import os
 from PIL import Image
 from math import ceil
@@ -18,6 +18,10 @@ def noisy(img,sigma):
     return img+sigma*torch.randn_like(img)
 
 def l1_distance(model, img, sigma,transform):
+    transform = transforms.Compose([    
+    transforms.ToPILImage(),
+    transforms.ToTensor()
+    ])
     return torch.norm(model(transform(img)) -
         model(transform(noisy(img, sigma))), 1).item()
 
@@ -93,11 +97,12 @@ def main():
     sample_num = 100
     threshold = 7
     model = load_net() #the arcfacce here
-    transforms = T.ToTensor()
+    transform = transforms.ToTensor()
+    
     natural_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Nat' # path to the dir of natural
     adv_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Adv'      # path to the dir of adversarial 
-    fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,transforms,threshold)
-    tpr, count_adv = detect(adv_dir,model,sigma,sample_num,transforms,threshold)
+    fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,transform,threshold)
+    tpr, count_adv = detect(adv_dir,model,sigma,sample_num,transform,threshold)
     print(f"at threshold{threshold}, sigma{sigma}, we get nat: {count_nat}, "
           f"tpr: {tpr:.2f},  nat: {count_adv}, fpr: {fpr:.2f}")
 
