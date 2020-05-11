@@ -1,45 +1,40 @@
 import torch
 import torch.nn.functional as F
-from torchvision import transforms
+from torchvision import transforms as T
 import os
 from PIL import Image
 from math import ceil
 import numpy as np
-from PIL import Image
-import glob
+from models.resnet import resnet_face18, resnet18
+from torch.nn import DataParallel
 
 
-def load_net():
+def load_net(path):
     """
     load arcface model in pytorch
     :return:
-    """    print("Model")
-    model = model.load_state_dict(torch.load('epochs/' + r100.pb, map_location=lambda storage, loc: storage)) 
-    #model = torch.load('C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/r100.pb')
-    
-    pass
+    """
+    model = resnet_face18(use_se=False)
+    state_dict = torch.load(path,map_location=torch.device('cpu'))
+    # create new OrderedDict that does not contain `module.`
+    from collections import OrderedDict
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        name = k[7:] # remove `module.`
+        new_state_dict[name] = v
+    model.load_state_dict(new_state_dict)
+
 
 def noisy(img,sigma):
     return img+sigma*torch.randn_like(img)
 
-def l1_distance(model, img, sigma,transform):
-    for image in img:
-       
-        img = Image.open(image)
-        
-        trans = transforms.ToPILImage()
-        trans1 = transforms.ToTensor()
-        plt.imshow(trans(trans1(img)))
+def l1_distance(model, img, sigma):
+    return torch.norm(model(img) - model(noisy(img, sigma)), 1).item()
 
-    
-    a = torch.norm(model(transforms(img)) -
-        model(transforms(noisy(img, sigma))), 1).item()
-  
-    
-    return a
 
 def detect(adv_dir,model,sigma,num,transform,threshold):
     """
+
     :param adv_dir: dirctory of adv examples
     :param model: arcface net
     :param sigma: variance of Gaussian noise
@@ -47,7 +42,7 @@ def detect(adv_dir,model,sigma,num,transform,threshold):
     :param batch_size:
     :return:
     """
-
+    model.eval()
     count = 0
     adv_img = os.listdir(adv_dir)
     total_adv = 0
@@ -73,6 +68,7 @@ def detect(adv_dir,model,sigma,num,transform,threshold):
 
 def get_natural_acc(natural_dir,model,sigma,num,transform,threshold):
     """
+
     :param adv_dir: dirctory of adv examples
     :param model: arcface net
     :param sigma: variance of Gaussian noise
@@ -80,7 +76,7 @@ def get_natural_acc(natural_dir,model,sigma,num,transform,threshold):
     :param batch_size:
     :return:
     """
-
+    model.eval()
     count = 0
     nat_img = os.listdir(natural_dir)
     total_imgs = 0
@@ -93,7 +89,8 @@ def get_natural_acc(natural_dir,model,sigma,num,transform,threshold):
             img = Image.open(adv_img_path)
             img = transform(img)
             # img_noise = noisy(img,sigma)
-            distance = l1_distance(model,img,sigma,transform)
+            img = img.unsqueeze(0)
+            distance = l1_distance(model,img,sigma)
             l1_val.append(distance)
         np.asarray(l1_val)
         mean_distance = np.mean(l1_val)
@@ -104,22 +101,31 @@ def get_natural_acc(natural_dir,model,sigma,num,transform,threshold):
     return fpr,count # the number of natural examples being wrongly detected (false positive)
 
 
-
 def main():
     sigma = 0.3
     sample_num = 100
     threshold = 7
-    model = load_net() #the arcfacce here
-    transform = transforms.ToTensor()
-    
-    #natural_dir = glob.glob("C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Nat") # path to the dir of natural
-    natural_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Nat'
-    adv_dir = glob.glob("C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Adv"  )    # path to the dir of adversarial 
-    fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,transform,threshold)
-    tpr, count_adv = detect(adv_dir,model,sigma,sample_num,transform,threshold)
-    print(f"at threshold{threshold}, sigma{sigma}, we get nat: {count_nat}, "
-          f"tpr: {tpr:.2f},  nat: {count_adv}, fpr: {fpr:.2f}")
+    modle_path = 'resnet18_110.pth'
+    model = resnet_face18(use_se=False)
+    model = DataParallel(model)
+    model.load_state_dict(torch.load(modle_path,map_location=torch.device('cpu')))
+    # model.to(torch.device("cuda"))
+    # model = load_net(modle_path) # do not use this function !!!
+    transform = T.Compose([
+        T.Resize(size=(120, 120)),
+        T.Grayscale(),
+        T.ToTensor()
+    ])
+    natural_dir = 'Data_Nat'
+    # adv_dir = ''      # path to the dir of adversarial examples
+    fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,
+                                     transform,threshold)
+    # tpr, count_adv = detect(adv_dir,model,sigma,sample_num, transform,threshold)
+    print(f"at threshold{threshold}, sigma{sigma}, we get natural example: {count_nat}")
+          # f"tpr: {tpr:.2f},  adversarial example: {count_adv}, fpr: {fpr:.2f}")
 
+    
 
 if __name__ == '__main__':
-    main() 
+    main()
+
