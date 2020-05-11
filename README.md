@@ -20,6 +20,10 @@ Images_Adv_Aligned_FINAL: Aligned Adversarial Data (600 * 600)
 https://drive.google.com/file/d/1fb70KgMRSmaEUF5cJ67BCD_DmTPCR5uJ/view (r100.pb)\
 https://github.com/ronghuaiyang/arcface-pytorch (resnet18_110.pth)
 
+3. Codes: 
+
+defense.py: Can find out the number of adversarial images and natural images in a folder
+
 Referenced and used part of https://arxiv.org/abs/1908.08705 for initialization code and theory.
 
 
