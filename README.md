@@ -8,7 +8,7 @@ Method: The base of detection mechanism is based upon the lack of robustness of 
 
 Directory:
 
-1. Data Folder: Contains 4 folders.\
+1. Data Folder: Contains 4 folders. (Only 1 person's images uploaded on github, if need be contact the authors)\ 
 Images_FINAL: Original Data\
 Images_Adv_FINAL: Data with sticker\
 Images_Aligned_FINAL: Aligned Data (600 * 600)\
