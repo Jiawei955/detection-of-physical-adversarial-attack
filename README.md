@@ -4,4 +4,4 @@ Goal: To create a detection algorithm against physical adversarial attack with a
 
 Method: The base of detection mechanism is based upon the lack of robustness of adversarial examples. 
 
-# download resnet18_110.pth from https://github.com/ronghuaiyang/arcface-pytorch before run defense.py
+### download resnet18_110.pth from https://github.com/ronghuaiyang/arcface-pytorch before run defense.py
