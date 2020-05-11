@@ -20,6 +20,6 @@ Images_Adv_Aligned_FINAL: Aligned Adversarial Data (600 * 600)
 https://drive.google.com/file/d/1fb70KgMRSmaEUF5cJ67BCD_DmTPCR5uJ/view (r100.pb)\
 https://github.com/ronghuaiyang/arcface-pytorch (resnet18_110.pth)
 
-Reference for initialization code and theory: https://arxiv.org/abs/1908.08705
+Referenced and used part of https://arxiv.org/abs/1908.08705 for initialization code and theory.
 
 
