@@ -5,25 +5,38 @@ import os
 from PIL import Image
 from math import ceil
 import numpy as np
+from PIL import Image
+import glob
 
 
 def load_net():
     """
     load arcface model in pytorch
     :return:
-    """
+    """    print("Model")
+    model = model.load_state_dict(torch.load('epochs/' + r100.pb, map_location=lambda storage, loc: storage)) 
+    #model = torch.load('C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/r100.pb')
+    
     pass
 
 def noisy(img,sigma):
     return img+sigma*torch.randn_like(img)
 
 def l1_distance(model, img, sigma,transform):
-    transform = transforms.Compose([    
-    transforms.ToPILImage(),
-    transforms.ToTensor()
-    ])
-    return torch.norm(model(transform(img)) -
-        model(transform(noisy(img, sigma))), 1).item()
+    for image in img:
+       
+        img = Image.open(image)
+        
+        trans = transforms.ToPILImage()
+        trans1 = transforms.ToTensor()
+        plt.imshow(trans(trans1(img)))
+
+    
+    a = torch.norm(model(transforms(img)) -
+        model(transforms(noisy(img, sigma))), 1).item()
+  
+    
+    return a
 
 def detect(adv_dir,model,sigma,num,transform,threshold):
     """
@@ -99,8 +112,9 @@ def main():
     model = load_net() #the arcfacce here
     transform = transforms.ToTensor()
     
-    natural_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Nat' # path to the dir of natural
-    adv_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Adv'      # path to the dir of adversarial 
+    #natural_dir = glob.glob("C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Nat") # path to the dir of natural
+    natural_dir = 'C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Nat'
+    adv_dir = glob.glob("C:/Users/Heetika/Documents/AllMyProjects/advhat-master/advhat-master/Demo/Data_Adv"  )    # path to the dir of adversarial 
     fpr, count_nat = get_natural_acc(natural_dir,model,sigma,sample_num,transform,threshold)
     tpr, count_adv = detect(adv_dir,model,sigma,sample_num,transform,threshold)
     print(f"at threshold{threshold}, sigma{sigma}, we get nat: {count_nat}, "
