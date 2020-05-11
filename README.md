@@ -15,7 +15,8 @@ Images_Adv_FINAL: Data with sticker\
 Images_Aligned_FINAL: Aligned Data (600 * 600)\
 Images_Adv_Aligned_FINAL: Aligned Adversarial Data (600 * 600)
 
-2. Models: Load 2 models\
+2. Models: Load 2 models
+
 https://drive.google.com/file/d/1fb70KgMRSmaEUF5cJ67BCD_DmTPCR5uJ/view (r100.pb)\
 https://github.com/ronghuaiyang/arcface-pytorch (resnet18_110.pth)
 
